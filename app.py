@@ -7,6 +7,7 @@ from shiny.express import input, ui
 from shinywidgets import render_plotly
 from shinywidgets import render_widget
 import shinyswatch
+from shiny import reactive
 
 # Use the built-in function to load the Palmer Penguins dataset
 penguins_df = palmerpenguins.load_penguins()
