@@ -119,17 +119,18 @@ with ui.navset_card_tab(id="tab"):
             return sns_hist
 
 # Display a plotly scatterplot
-
-@render_plotly
-def plotly_scatterplot():
-    scatter_plot = px.scatter(
-        data_frame=penguins_df,
-        x="flipper_length_mm",
-        y="body_mass_g",
-        color="species",
-        title="Plotly Scatter: Species",
-        labels={"flipper_length_mm": "Flipper Length (mm)", "body_mass_g": "Body Mass (g)"},
-        hover_data={"species": True}
-    )
-    return scatter_plot
+    
+    with ui.nav_panel("Scatter"):
+        @render_plotly
+        def plotly_scatterplot():
+            scatter_plot = px.scatter(
+                data_frame=penguins_df,
+                x="flipper_length_mm",
+                y="body_mass_g",
+                color="species",
+                title="Plotly Scatter: Species",
+                labels={"flipper_length_mm": "Flipper Length (mm)", "body_mass_g": "Body Mass (g)"},
+                hover_data={"species": True}
+            )
+            return scatter_plot
 
