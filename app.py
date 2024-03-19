@@ -8,6 +8,7 @@ from shinywidgets import render_plotly
 from shinywidgets import render_widget
 import shinyswatch
 from shiny import reactive
+import pandas as pd
 
 # Use the built-in function to load the Palmer Penguins dataset
 penguins_df = palmerpenguins.load_penguins()
@@ -94,7 +95,7 @@ with ui.navset_card_tab(id="tab"):
         @render_plotly
         def plot():
             plty_hist = px.histogram(
-                data_frame=penguins_df,
+                data_frame=filtered_data(),
                 x=input.selected_attribute(),
                 nbins=input.px_bin_count(),
                 color="species"
@@ -111,7 +112,7 @@ with ui.navset_card_tab(id="tab"):
         @render.plot
         def sns_gram():
             sns_hist = sns.histplot(
-                data=penguins_df,  # Use 'data' instead of 'data_frame'
+                data=filtered_data(),  # Use 'data' instead of 'data_frame'
                 x="bill_length_mm",
                 bins=input.sns_bin_count())
             sns_hist.set_xlabel("Bill Length") 
@@ -125,7 +126,7 @@ with ui.navset_card_tab(id="tab"):
         @render_plotly
         def plotly_scatterplot():
             scatter_plot = px.scatter(
-                data_frame=penguins_df,
+                data_frame=filtered_data(),
                 x="flipper_length_mm",
                 y="body_mass_g",
                 color="species",
@@ -134,4 +135,9 @@ with ui.navset_card_tab(id="tab"):
                 hover_data={"species": True}
             )
             return scatter_plot
+
+@reactive.calc
+def filtered_data():
+    return penguins_df[
+        (penguins_df["species"].isin(input.species_selected()))]
 
