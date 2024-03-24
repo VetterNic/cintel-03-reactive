@@ -10,6 +10,7 @@ import shinyswatch
 from shiny import reactive
 import pandas as pd
 
+
 # Use the built-in function to load the Palmer Penguins dataset
 penguins_df = palmerpenguins.load_penguins()
 
@@ -37,7 +38,7 @@ with ui.sidebar(open="open"):
 #   e.g. ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
     
     ui.input_selectize("selected_attribute", "Attribute Selected", 
-                       ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"])
+                       ["All","bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"])
 
 # Use ui.input_numeric() to create a numeric input for the number of Plotly histogram bins
 #   pass in two arguments:
@@ -94,16 +95,29 @@ with ui.navset_card_tab(id="tab"):
     with ui.nav_panel("Plty Hist"):
         @render_plotly
         def plot():
-            plty_hist = px.histogram(
-                data_frame=filtered_data(),
-                x=input.selected_attribute(),
-                nbins=input.px_bin_count(),
-                color="species"
-            ).update_layout(
-                title={"text": "Penguin Mass", "x": 0.5},
-                yaxis_title="Count",
-                xaxis_title="selected_attribute",
-            )
+            selected_attribute = input.selected_attribute()
+            if selected_attribute == "All":
+                plty_hist = px.histogram(
+                    data_frame=filtered_data(),
+                    x="flipper_length_mm",  # Choose a default column
+                    nbins=input.px_bin_count(),
+                    color="species"
+                ).update_layout(
+                    title={"text": "Penguin Mass", "x": 0.5},
+                    yaxis_title="Count",
+                    xaxis_title="Flipper Length (mm)",
+                )
+            else:
+                plty_hist = px.histogram(
+                    data_frame=filtered_data(),
+                    x=selected_attribute,
+                    nbins=input.px_bin_count(),
+                    color="species"
+                ).update_layout(
+                    title={"text": "Penguin Mass", "x": 0.5},
+                    yaxis_title="Count",
+                    xaxis_title=selected_attribute,
+                )
             return plty_hist
 
 # Display Histogram with SNS
@@ -135,6 +149,11 @@ with ui.navset_card_tab(id="tab"):
                 hover_data={"species": True}
             )
             return scatter_plot
+
+@reactive.calc
+def filtered_data():
+    return penguins_df[
+        (penguins_df["species"].isin(input.species_selected()))]
 
 @reactive.calc
 def filtered_data():
