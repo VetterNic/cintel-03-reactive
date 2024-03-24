@@ -83,11 +83,14 @@ with ui.layout_columns():
         with ui.accordion_panel("DataTable"):
             @render.data_frame
             def vet_penguin_datatable():
-                return render.DataTable(penguins_df)
+                
+                return render.DataTable(filter_data_by_species())
+                
         with ui.accordion_panel("Data Grid"):
             @render.data_frame
             def vet_penguin_data_grid():
-                return render.DataGrid(penguins_df)
+                
+                return render.DataGrid(filter_data_by_species())
 
 # Display Histogram with plotly
         
@@ -103,7 +106,7 @@ with ui.navset_card_tab(id="tab"):
                     nbins=input.px_bin_count(),
                     color="species"
                 ).update_layout(
-                    title={"text": "Penguin Mass", "x": 0.5},
+                    title={"text": "Reactive Attribute", "x": 0.5},
                     yaxis_title="Count",
                     xaxis_title="Flipper Length (mm)",
                 )
@@ -114,7 +117,7 @@ with ui.navset_card_tab(id="tab"):
                     nbins=input.px_bin_count(),
                     color="species"
                 ).update_layout(
-                    title={"text": "Penguin Mass", "x": 0.5},
+                    title={"text": "Reactive Attribute", "x": 0.5},
                     yaxis_title="Count",
                     xaxis_title=selected_attribute,
                 )
@@ -126,12 +129,12 @@ with ui.navset_card_tab(id="tab"):
         @render.plot
         def sns_gram():
             sns_hist = sns.histplot(
-                data=filtered_data(),  # Use 'data' instead of 'data_frame'
+                data=filtered_data(), 
                 x="bill_length_mm",
                 bins=input.sns_bin_count())
             sns_hist.set_xlabel("Bill Length") 
             sns_hist.set_ylabel("Count") 
-            sns_hist.set_title("Length of Bill")  
+            sns_hist.set_title("Reactive Sns Hist")  
             return sns_hist
 
 # Display a plotly scatterplot
@@ -154,6 +157,17 @@ with ui.navset_card_tab(id="tab"):
 def filtered_data():
     return penguins_df[
         (penguins_df["species"].isin(input.species_selected()))]
+
+@reactive.calc
+def filter_data_by_species():
+    selected_species = input.species_selected()
+    if "All" in selected_species:
+        return penguins_df
+    else:
+        return penguins_df[penguins_df["species"].isin(selected_species)]
+
+
+
 
 @reactive.calc
 def filtered_data():
