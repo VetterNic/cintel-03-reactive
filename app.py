@@ -167,10 +167,3 @@ def filter_data_by_species():
         return penguins_df[penguins_df["species"].isin(selected_species)]
 
 
-
-
-@reactive.calc
-def filtered_data():
-    return penguins_df[
-        (penguins_df["species"].isin(input.species_selected()))]
-
